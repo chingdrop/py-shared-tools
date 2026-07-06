@@ -20,6 +20,15 @@ between projects.
   loader: an unset `${VAR}` resolves to `None` (a valid "no credentials
   configured" state), not an error. Each consumer keeps its own `AppConfig`
   shape and YAML-section parsing; only this one resolution rule is shared.
+- `shared_tools/remote_exec.py` — `VendorConnector`/`ConnectorError`/
+  `ConnectorRegistry`, the generic parts of a vendor security-console
+  connector: a credentialed `RestAdapter` session, live-vs-fixture dispatch
+  for `deploy_and_run()` (push a script to a managed endpoint, poll until
+  done, return its output — SentinelOne Remote Script Orchestration, Carbon
+  Black Live Response, ...), and a per-project vendor registry. What "fixture
+  mode" actually returns, and anything domain-specific (e.g. fetching an
+  inventory), is left to each consumer's own subclass — this only owns the
+  mechanics every vendor connector needs regardless of what it fetches.
 
 ## Using this in a consuming project
 
@@ -32,6 +41,7 @@ uv add --editable vendor/py-shared-tools[storage]   # drop [storage] if you don'
 from shared_tools.rest_adapter import RestAdapter, RestAdapterConfig
 from shared_tools.storage import ObjectStorage, StorageError
 from shared_tools.config import resolve_env_refs, ConfigError
+from shared_tools.remote_exec import VendorConnector, ConnectorError, ConnectorRegistry
 ```
 
 To pick up changes made in a consuming project's clone of this submodule (or
