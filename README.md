@@ -15,6 +15,11 @@ between projects.
   out short-lived presigned PUT URLs rather than standing credentials.
   Requires the `storage` extra (`boto3`); everything else in this package
   works without it.
+- `shared_tools/config.py` — `resolve_env_refs`/`ConfigError`, the `${VAR}`
+  secret-resolution rule shared by every consumer's own `config.yaml` + `.env`
+  loader: an unset `${VAR}` resolves to `None` (a valid "no credentials
+  configured" state), not an error. Each consumer keeps its own `AppConfig`
+  shape and YAML-section parsing; only this one resolution rule is shared.
 
 ## Using this in a consuming project
 
@@ -26,6 +31,7 @@ uv add --editable vendor/py-shared-tools[storage]   # drop [storage] if you don'
 ```python
 from shared_tools.rest_adapter import RestAdapter, RestAdapterConfig
 from shared_tools.storage import ObjectStorage, StorageError
+from shared_tools.config import resolve_env_refs, ConfigError
 ```
 
 To pick up changes made in a consuming project's clone of this submodule (or
