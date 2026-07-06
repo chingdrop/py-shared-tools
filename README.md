@@ -20,6 +20,10 @@ between projects.
   loader: an unset `${VAR}` resolves to `None` (a valid "no credentials
   configured" state), not an error. Each consumer keeps its own `AppConfig`
   shape and YAML-section parsing; only this one resolution rule is shared.
+  Also `StorageConfig`/`parse_storage_config`/`get_storage` — the S3-compatible
+  object-storage config shape + builder for `shared_tools/script_export.py`'s
+  handoff, byte-for-byte identical in `agent-parity` and `credential-audit`'s
+  own `config.py` before this was extracted.
 - `shared_tools/remote_exec.py` — `VendorConnector`/`ConnectorError`/
   `ConnectorRegistry`, the generic parts of a vendor security-console
   connector: a credentialed `RestAdapter` session, live-vs-fixture dispatch
@@ -37,6 +41,17 @@ between projects.
   project-specific base (`class SentinelOneConnector(SentinelOneRSOMixin,
   AgentConnector)`, etc.) rather than forcing one inheritance shape on
   everyone.
+- `shared_tools/script_export.py` — `run_script_export`/`ScriptExecutionError`,
+  the storage-backed script-export handoff: push a script via a
+  `VendorConnector`, prefer a presigned-upload-URL round trip through
+  `ObjectStorage` over trusting the connector's own remote-execution output
+  channel (which doesn't reliably preserve a CSV's exact formatting), fall
+  back to the connector's direct return value in fixture mode. Parameterized
+  by `object_key_prefix`/`header_marker`/`what` — this was
+  `agent-parity`'s `run_ad_export` and `credential-audit`'s
+  `run_ad_metadata_export`, byte-for-byte identical logic under two names,
+  before being extracted here. Each consumer's own `deployment/script_runner.py`
+  is now a thin wrapper supplying its own script-path constant and parameters.
 
 ## Using this in a consuming project
 
@@ -48,9 +63,10 @@ uv add --editable vendor/py-shared-tools[storage]   # drop [storage] if you don'
 ```python
 from shared_tools.rest_adapter import RestAdapter, RestAdapterConfig
 from shared_tools.storage import ObjectStorage, StorageError
-from shared_tools.config import resolve_env_refs, ConfigError
+from shared_tools.config import resolve_env_refs, ConfigError, StorageConfig, get_storage
 from shared_tools.remote_exec import VendorConnector, ConnectorError, ConnectorRegistry
 from shared_tools.sentinelone import SentinelOneRSOMixin
+from shared_tools.script_export import run_script_export, ScriptExecutionError
 ```
 
 To pick up changes made in a consuming project's clone of this submodule (or
