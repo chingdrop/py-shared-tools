@@ -29,6 +29,14 @@ between projects.
   mode" actually returns, and anything domain-specific (e.g. fetching an
   inventory), is left to each consumer's own subclass — this only owns the
   mechanics every vendor connector needs regardless of what it fetches.
+- `shared_tools/sentinelone.py` — `SentinelOneRSOMixin`, the actual SentinelOne
+  Remote Script Orchestration API calls (upload the script, execute it,
+  poll `remote-scripts/status`, fetch the result) shared verbatim by
+  `agent-parity` and `credential-audit`'s own `SentinelOneConnector` classes.
+  A mixin, not a full base class, so each consumer combines it with its own
+  project-specific base (`class SentinelOneConnector(SentinelOneRSOMixin,
+  AgentConnector)`, etc.) rather than forcing one inheritance shape on
+  everyone.
 
 ## Using this in a consuming project
 
@@ -42,6 +50,7 @@ from shared_tools.rest_adapter import RestAdapter, RestAdapterConfig
 from shared_tools.storage import ObjectStorage, StorageError
 from shared_tools.config import resolve_env_refs, ConfigError
 from shared_tools.remote_exec import VendorConnector, ConnectorError, ConnectorRegistry
+from shared_tools.sentinelone import SentinelOneRSOMixin
 ```
 
 To pick up changes made in a consuming project's clone of this submodule (or
