@@ -10,6 +10,14 @@ between projects.
 - `shared_tools/rest_adapter.py` — `RestAdapter`/`RestAdapterConfig`, a thin
   `requests.Session` wrapper with retries, content-type-aware response
   parsing, and a unified request method.
+- `shared_tools/retry.py` — `call_with_retry`, a generic, HTTP-agnostic
+  retry-with-backoff loop for a call that can fail either by raising an
+  exception or by returning a "successful but unusable" result (an HTML error
+  page instead of JSON, a response that decodes fine but isn't the shape
+  expected). Complements `RestAdapter`'s own transport-level retries (429/5xx
+  via urllib3), which have no way to see a problem in a `200`'s body. Used by
+  `surface-scan`'s crt.sh client; a good fit for `credential-audit`'s HIBP
+  range client too (not yet migrated — see that project's own follow-up).
 - `shared_tools/storage.py` — `ObjectStorage`/`StorageError`, a small S3-API
   wrapper (works against AWS S3 or a self-hosted MinIO) built around handing
   out short-lived presigned PUT URLs rather than standing credentials.
