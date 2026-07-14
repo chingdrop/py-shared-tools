@@ -32,6 +32,15 @@ between projects.
   object-storage config shape + builder for `shared_tools/script_export.py`'s
   handoff, byte-for-byte identical in `agent-parity` and `credential-audit`'s
   own `config.py` before this was extracted.
+- `shared_tools/config_loader.py` — `ConfigLoader`, a lazy, reloadable
+  `MutableMapping` over a JSON or YAML config file, with dot-separated
+  nested-key lookup (`config.get("a.b.c")`) and optional `${VAR}`-within-a-
+  string expansion via `os.path.expandvars`. Byte-for-byte identical in
+  `vega-tools` and `vt-console` before being extracted here. A different
+  rule from `shared_tools.config`'s `resolve_env_refs` (see that module's
+  docstring) — this one owns the file I/O and parsing itself; pick whichever
+  shape a given consumer's config actually needs. YAML support needs the
+  `yaml` extra (`pyyaml`); JSON works without it.
 - `shared_tools/remote_exec.py` — `VendorConnector`/`ConnectorError`/
   `ConnectorRegistry`, the generic parts of a vendor security-console
   connector: a credentialed `RestAdapter` session, live-vs-fixture dispatch
@@ -72,6 +81,7 @@ uv add --editable vendor/py-shared-tools[storage]   # drop [storage] if you don'
 from shared_tools.rest_adapter import RestAdapter, RestAdapterConfig
 from shared_tools.storage import ObjectStorage, StorageError
 from shared_tools.config import resolve_env_refs, ConfigError, StorageConfig, get_storage
+from shared_tools.config_loader import ConfigLoader
 from shared_tools.remote_exec import VendorConnector, ConnectorError, ConnectorRegistry
 from shared_tools.sentinelone import SentinelOneRSOMixin
 from shared_tools.script_export import run_script_export, ScriptExecutionError
