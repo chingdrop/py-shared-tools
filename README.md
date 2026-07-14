@@ -45,6 +45,11 @@ between projects.
   file writes (write to a temp file in the same directory, then
   `os.replace` into place, so a reader or a crash mid-write never sees a
   partial file) and idempotent directory creation. Stdlib-only.
+- `shared_tools/logging_setup.py` — `setup_logging`, a console-logging setup
+  for CLI scripts that's idempotent by construction: calling it again on the
+  same logger updates the level but never attaches a second handler, so a
+  script and something it imports (or a test re-running the same entrypoint)
+  can both call it without doubled-up log lines. Stdlib-only.
 - `shared_tools/remote_exec.py` — `VendorConnector`/`ConnectorError`/
   `ConnectorRegistry`, the generic parts of a vendor security-console
   connector: a credentialed `RestAdapter` session, live-vs-fixture dispatch
@@ -87,6 +92,7 @@ from shared_tools.storage import ObjectStorage, StorageError
 from shared_tools.config import resolve_env_refs, ConfigError, StorageConfig, get_storage
 from shared_tools.config_loader import ConfigLoader
 from shared_tools.atomic_io import atomic_write, ensure_dir
+from shared_tools.logging_setup import setup_logging
 from shared_tools.remote_exec import VendorConnector, ConnectorError, ConnectorRegistry
 from shared_tools.sentinelone import SentinelOneRSOMixin
 from shared_tools.script_export import run_script_export, ScriptExecutionError
