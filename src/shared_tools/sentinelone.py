@@ -19,7 +19,7 @@ into also provides ``shared_tools.remote_exec.VendorConnector``'s
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Protocol
+from typing import TYPE_CHECKING, ClassVar, Protocol
 
 from shared_tools.remote_exec import ConnectorError
 
@@ -36,10 +36,19 @@ if TYPE_CHECKING:
         inherited from at runtime (see ``SentinelOneRSOMixin``'s own
         docstring for why the mixin itself deliberately doesn't inherit
         ``VendorConnector``).
+
+        ``vendor`` MUST stay ``ClassVar[str]`` here, matching
+        ``VendorConnector.vendor``'s own ``ClassVar`` — a plain ``str``
+        looks equivalent but mypy treats a protocol's instance-attribute
+        member and a ``ClassVar`` implementation as structurally
+        incompatible, which silently breaks self-type matching for every
+        other member on this protocol too (surfaced as a confusing
+        "Invalid self argument" error on ``_headers``, not on ``vendor``
+        itself).
         """
 
         credentials: dict
-        vendor: str
+        vendor: ClassVar[str]
 
         @property
         def _headers(self) -> dict: ...
