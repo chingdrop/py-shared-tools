@@ -5,6 +5,11 @@ be consumed as a git submodule (added at a path like `vendor/py-shared-tools`
 in a consuming repo) plus a `uv` path dependency, rather than copy-pasted
 between projects.
 
+Ships a `py.typed` marker (PEP 561), so a consumer's own `mypy`/`pyright` run
+checks against this package's real inline type hints instead of treating it
+as untyped — no `ignore_missing_imports` override needed for `shared_tools.*`
+in a consumer's own config.
+
 ## What's here
 
 - `shared_tools/rest_adapter.py` — `RestAdapter`/`RestAdapterConfig`, a thin
