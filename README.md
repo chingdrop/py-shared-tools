@@ -117,3 +117,13 @@ new pinned commit.
 uv sync
 uv run pytest
 ```
+
+## Linting and type-checking
+
+```console
+uv run ruff check .
+uv run ruff format --check .
+uv run mypy
+```
+
+All three run in CI (`.github/workflows/ci.yml`) alongside the test matrix.
