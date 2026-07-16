@@ -10,6 +10,13 @@ checks against this package's real inline type hints instead of treating it
 as untyped — no `ignore_missing_imports` override needed for `shared_tools.*`
 in a consumer's own config.
 
+Uses the `src/` layout (the package lives at `src/shared_tools/`, not at the
+repo root) — the recommendation for anything meant to be installed/reused
+rather than run in place, since it keeps repo-root files (this README,
+`pyproject.toml`, ...) off the import path during an editable install. This
+is purely a repo-layout detail: `import shared_tools.rest_adapter` etc. is
+unaffected either way.
+
 ## What's here
 
 - `shared_tools/rest_adapter.py` — `RestAdapter`/`RestAdapterConfig`, a thin
