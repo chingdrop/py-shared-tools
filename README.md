@@ -40,7 +40,10 @@ between projects.
   rule from `shared_tools.config`'s `resolve_env_refs` (see that module's
   docstring) — this one owns the file I/O and parsing itself; pick whichever
   shape a given consumer's config actually needs. YAML support needs the
-  `yaml` extra (`pyyaml`); JSON works without it.
+  `yaml` extra (`pyyaml`); JSON works without it. Includes `.copy()` — a
+  shallow, in-memory snapshot that still supports dot-notation `.get()`,
+  matching a call site that mutates its own working copy of a shared
+  `ctx.obj` (`vega-tools`' `parse_report` CLI group).
 - `shared_tools/atomic_io.py` — `atomic_write`/`ensure_dir`, crash-safe local
   file writes (write to a temp file in the same directory, then
   `os.replace` into place, so a reader or a crash mid-write never sees a

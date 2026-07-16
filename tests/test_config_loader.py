@@ -90,6 +90,36 @@ def test_reload_picks_up_file_changes(tmp_path):
     assert config.get("a") == "second"
 
 
+def test_copy_returns_independent_config_loader(tmp_path):
+    path = tmp_path / "config.json"
+    path.write_text('{"a": 1, "b": 2}')
+    config = ConfigLoader(path)
+
+    copied = config.copy()
+    assert copied is not config
+    assert isinstance(copied, ConfigLoader)
+    assert dict(copied) == {"a": 1, "b": 2}
+
+
+def test_copy_preserves_dot_notation_get(tmp_path):
+    path = tmp_path / "config.json"
+    path.write_text('{"a": {"b": "value"}}')
+    config = ConfigLoader(path)
+
+    copied = config.copy()
+    assert copied.get("a.b") == "value"
+
+
+def test_copy_mutation_does_not_affect_original(tmp_path):
+    path = tmp_path / "config.json"
+    path.write_text('{"a": 1}')
+    config = ConfigLoader(path)
+
+    copied = config.copy()
+    copied._data["a"] = 2
+    assert config["a"] == 1
+
+
 def test_mapping_interface_is_read_only(tmp_path):
     path = tmp_path / "config.json"
     path.write_text('{"a": 1}')

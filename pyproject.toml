@@ -7,7 +7,7 @@ packages = ["shared_tools"]
 
 [project]
 name = "py-shared-tools"
-version = "1.2.0"
+version = "1.2.1"
 description = "Small, dependency-minimal HTTP/storage/config/vendor-connector/retry utilities shared across personal projects (RestAdapter, ObjectStorage, config env-ref resolution, ConfigLoader, atomic file writes, idempotent logging setup, VendorConnector/remote_exec, SentinelOne RSO mixin, script-export storage handoff, generic retry-with-backoff)."
 readme = "README.md"
 requires-python = ">=3.12"
