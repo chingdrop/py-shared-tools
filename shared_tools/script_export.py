@@ -34,15 +34,15 @@ class ScriptExecutionError(Exception):
 
 
 def run_script_export(
-        connector: VendorConnector,
-        target_id: str,
-        script_path: str | Path,
-        *,
-        storage: ObjectStorage | None = None,
-        object_key: str | None = None,
-        object_key_prefix: str = "exports",
-        header_marker: str = "Name",
-        what: str = "export",
+    connector: VendorConnector,
+    target_id: str,
+    script_path: str | Path,
+    *,
+    storage: ObjectStorage | None = None,
+    object_key: str | None = None,
+    object_key_prefix: str = "exports",
+    header_marker: str = "Name",
+    what: str = "export",
 ) -> str:
     """Run ``script_path`` on ``target_id`` via ``connector`` and return its
     raw CSV text.
@@ -89,7 +89,6 @@ def _validate_csv(vendor: str, target_id: str, raw: str, header_marker: str, wha
     # the script always emits a CSV header naming the expected column.
     if header_marker not in raw.splitlines()[0]:
         raise ScriptExecutionError(
-            f"{vendor}: {what} output does not look like the "
-            f"expected CSV (first line: {raw.splitlines()[0]!r})"
+            f"{vendor}: {what} output does not look like the expected CSV (first line: {raw.splitlines()[0]!r})"
         )
     return raw

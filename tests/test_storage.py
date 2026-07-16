@@ -15,9 +15,7 @@ def storage():
     with mock_aws():
         client = boto3.client("s3", region_name="us-east-1")
         client.create_bucket(Bucket="test-bucket")
-        yield ObjectStorage(
-            bucket="test-bucket", access_key="test", secret_key="test", region="us-east-1"
-        )
+        yield ObjectStorage(bucket="test-bucket", access_key="test", secret_key="test", region="us-east-1")
 
 
 def test_presigned_put_url_round_trips_content(storage):

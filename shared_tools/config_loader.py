@@ -21,9 +21,9 @@ from __future__ import annotations
 import json
 import logging
 import os
-from collections.abc import MutableMapping
+from collections.abc import Iterator, MutableMapping
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any
 
 from shared_tools.config import ConfigError
 
@@ -37,11 +37,11 @@ class ConfigLoader(MutableMapping):
     """
 
     def __init__(
-            self,
-            filepath: Path | str,
-            *,
-            env_expand: bool = False,
-            logger: logging.Logger | None = None,
+        self,
+        filepath: Path | str,
+        *,
+        env_expand: bool = False,
+        logger: logging.Logger | None = None,
     ) -> None:
         self.filepath = Path(filepath)
         self.env_expand = env_expand
@@ -62,6 +62,7 @@ class ConfigLoader(MutableMapping):
         try:
             if suffix in (".yaml", ".yml"):
                 import yaml
+
                 data = yaml.safe_load(text)
             elif suffix == ".json":
                 data = json.loads(text)
@@ -112,7 +113,7 @@ class ConfigLoader(MutableMapping):
     def __len__(self) -> int:
         return len(self._data)
 
-    def copy(self) -> "ConfigLoader":
+    def copy(self) -> ConfigLoader:
         """Return a shallow, in-memory copy that still supports dot-notation
         ``.get()``.
 

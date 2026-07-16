@@ -36,9 +36,7 @@ class _TestSentinelOneConnector(SentinelOneRSOMixin, VendorConnector):
 
 
 def _connector():
-    return _TestSentinelOneConnector(
-        credentials={"api_url": "https://usea1.example", "api_token": "tok"}
-    )
+    return _TestSentinelOneConnector(credentials={"api_url": "https://usea1.example", "api_token": "tok"})
 
 
 def test_headers_use_api_token_scheme():
@@ -97,9 +95,7 @@ def test_live_deploy_and_run_raises_on_terminal_failure_states(monkeypatch, tmp_
             _FakeResponse(json_data={"data": [{"status": state}]}),
         ]
     )
-    monkeypatch.setattr(
-        connector.session.session, "request", lambda **kwargs: next(responses)
-    )
+    monkeypatch.setattr(connector.session.session, "request", lambda **kwargs: next(responses))
 
     with pytest.raises(ConnectorError, match=f"remote script {state} on AGENT1"):
         connector.deploy_and_run(script, "AGENT1")

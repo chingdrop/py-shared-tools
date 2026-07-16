@@ -26,9 +26,7 @@ def test_retries_on_retryable_exception_then_succeeds():
             raise ValueError("boom")
         return "ok"
 
-    result, warnings = call_with_retry(
-        flaky, retries=3, retryable_exceptions=(ValueError,), sleep=_no_sleep
-    )
+    result, warnings = call_with_retry(flaky, retries=3, retryable_exceptions=(ValueError,), sleep=_no_sleep)
     assert result == "ok"
     assert len(calls) == 2
     assert len(warnings) == 1
@@ -75,9 +73,7 @@ def test_exhausts_retries_and_degrades_gracefully_never_raises():
         calls.append(1)
         return "bad"
 
-    result, warnings = call_with_retry(
-        always_bad, retries=2, is_retryable_result=lambda r: True, sleep=_no_sleep
-    )
+    result, warnings = call_with_retry(always_bad, retries=2, is_retryable_result=lambda r: True, sleep=_no_sleep)
     assert result is None  # never raises; degrades to None
     assert len(calls) == 3  # 1 initial + 2 retries, never more
     assert "exhausted 3 attempt(s)" in warnings[-1]
@@ -87,9 +83,7 @@ def test_exhausts_retries_on_persistent_exception():
     def always_raises():
         raise ValueError("persistent")
 
-    result, warnings = call_with_retry(
-        always_raises, retries=2, retryable_exceptions=(ValueError,), sleep=_no_sleep
-    )
+    result, warnings = call_with_retry(always_raises, retries=2, retryable_exceptions=(ValueError,), sleep=_no_sleep)
     assert result is None
     assert len(warnings) == 4  # 3 raised-exception warnings (all attempts) + 1 final summary
 
@@ -112,9 +106,7 @@ def test_backoff_doubles_between_attempts():
 
 def test_never_sleeps_after_final_attempt():
     sleeps = []
-    call_with_retry(
-        lambda: "bad", retries=0, is_retryable_result=lambda r: True, sleep=sleeps.append
-    )
+    call_with_retry(lambda: "bad", retries=0, is_retryable_result=lambda r: True, sleep=sleeps.append)
     assert sleeps == []  # only one attempt total (retries=0); nothing to wait between
 
 

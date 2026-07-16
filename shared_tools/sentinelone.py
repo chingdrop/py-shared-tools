@@ -37,9 +37,7 @@ class SentinelOneRSOMixin:
     def _headers(self) -> dict:
         return {"Authorization": f"ApiToken {self.credentials['api_token']}"}
 
-    def _live_deploy_and_run(
-            self, script_path: Path, target_id: str, script_args: dict[str, str]
-    ) -> str:
+    def _live_deploy_and_run(self, script_path: Path, target_id: str, script_args: dict[str, str]) -> str:
         base = self.credentials["api_url"].rstrip("/")
 
         # 1. Upload the script to the script library.

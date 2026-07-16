@@ -88,9 +88,7 @@ def test_live_mode_with_storage_deletes_object_after_download(moto_storage):
         return "ok"
 
     connector = _fake_connector(is_live=True, deploy_and_run=Mock(side_effect=fake_deploy_and_run))
-    run_script_export(
-        connector, "ACME-DC01", "script.ps1", storage=moto_storage, object_key="acme/export.csv"
-    )
+    run_script_export(connector, "ACME-DC01", "script.ps1", storage=moto_storage, object_key="acme/export.csv")
 
     from shared_tools.storage import StorageError
 
@@ -108,9 +106,7 @@ def test_empty_upload_is_rejected(moto_storage):
 
     connector = _fake_connector(is_live=True, deploy_and_run=Mock(side_effect=fake_deploy_and_run))
     with pytest.raises(ScriptExecutionError, match="returned no output"):
-        run_script_export(
-            connector, "ACME-DC01", "script.ps1", storage=moto_storage, object_key="acme/empty.csv"
-        )
+        run_script_export(connector, "ACME-DC01", "script.ps1", storage=moto_storage, object_key="acme/empty.csv")
 
 
 def test_missing_upload_surfaces_as_storage_error(moto_storage):
@@ -122,8 +118,11 @@ def test_missing_upload_surfaces_as_storage_error(moto_storage):
     connector = _fake_connector(is_live=True, deploy_and_run=Mock(return_value="ok"))
     with pytest.raises(StorageError):
         run_script_export(
-            connector, "ACME-DC01", "script.ps1",
-            storage=moto_storage, object_key="acme/never-uploaded.csv",
+            connector,
+            "ACME-DC01",
+            "script.ps1",
+            storage=moto_storage,
+            object_key="acme/never-uploaded.csv",
         )
 
 
@@ -137,9 +136,7 @@ def test_wrong_shaped_output_is_rejected(moto_storage):
 
     connector = _fake_connector(is_live=True, deploy_and_run=Mock(side_effect=fake_deploy_and_run))
     with pytest.raises(ScriptExecutionError, match="does not look like"):
-        run_script_export(
-            connector, "ACME-DC01", "script.ps1", storage=moto_storage, object_key="acme/wrong.csv"
-        )
+        run_script_export(connector, "ACME-DC01", "script.ps1", storage=moto_storage, object_key="acme/wrong.csv")
 
 
 def test_fixture_mode_rejects_wrong_shaped_output():
@@ -157,9 +154,7 @@ def test_object_key_prefix_is_used_when_no_explicit_key():
     storage.get_object.return_value = SAMPLE_CSV.encode()
     connector = _fake_connector(is_live=True)
 
-    run_script_export(
-        connector, "ACME-DC01", "script.ps1", storage=storage, object_key_prefix="ad-metadata"
-    )
+    run_script_export(connector, "ACME-DC01", "script.ps1", storage=storage, object_key_prefix="ad-metadata")
 
     (put_key,), _ = storage.presigned_put_url.call_args
     (get_key,), _ = storage.get_object.call_args
@@ -181,8 +176,11 @@ def test_header_marker_customizes_validation(moto_storage):
 
     connector = _fake_connector(is_live=True, deploy_and_run=Mock(side_effect=fake_deploy_and_run))
     result = run_script_export(
-        connector, "ACME-DC01", "script.ps1",
-        storage=moto_storage, header_marker="sAMAccountName",
+        connector,
+        "ACME-DC01",
+        "script.ps1",
+        storage=moto_storage,
+        header_marker="sAMAccountName",
     )
     assert result.startswith("sAMAccountName,")
 

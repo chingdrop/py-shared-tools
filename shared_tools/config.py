@@ -109,9 +109,7 @@ def get_storage(storage_config: StorageConfig):
     from shared_tools.storage import ObjectStorage
 
     if storage_config.backend != "s3":
-        raise ConfigError(
-            f"Unsupported storage backend {storage_config.backend!r}; only 's3' is implemented"
-        )
+        raise ConfigError(f"Unsupported storage backend {storage_config.backend!r}; only 's3' is implemented")
     return ObjectStorage(
         bucket=storage_config.bucket,
         endpoint_url=storage_config.endpoint_url,

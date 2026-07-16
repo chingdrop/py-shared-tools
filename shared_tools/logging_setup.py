@@ -27,12 +27,12 @@ DEFAULT_DATEFMT = "%Y-%m-%d %H:%M:%S"
 
 
 def setup_logging(
-        level: int | str = logging.INFO,
-        *,
-        fmt: str = DEFAULT_FORMAT,
-        datefmt: str = DEFAULT_DATEFMT,
-        stream=None,
-        logger: logging.Logger | None = None,
+    level: int | str = logging.INFO,
+    *,
+    fmt: str = DEFAULT_FORMAT,
+    datefmt: str = DEFAULT_DATEFMT,
+    stream=None,
+    logger: logging.Logger | None = None,
 ) -> logging.Logger:
     """Attach a formatted ``StreamHandler`` to ``logger`` (the root logger by
     default) and set its level, idempotently.

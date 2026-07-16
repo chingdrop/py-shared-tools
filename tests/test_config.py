@@ -75,16 +75,18 @@ def test_parse_storage_config_defaults_for_empty_section():
 
 
 def test_parse_storage_config_reads_all_fields():
-    config = parse_storage_config({
-        "storage": {
-            "backend": "s3",
-            "endpoint_url": "http://minio:9000",
-            "bucket": "my-bucket",
-            "access_key": "ak",
-            "secret_key": "sk",
-            "region": "us-west-2",
+    config = parse_storage_config(
+        {
+            "storage": {
+                "backend": "s3",
+                "endpoint_url": "http://minio:9000",
+                "bucket": "my-bucket",
+                "access_key": "ak",
+                "secret_key": "sk",
+                "region": "us-west-2",
+            }
         }
-    })
+    )
     assert config == StorageConfig(
         backend="s3",
         endpoint_url="http://minio:9000",

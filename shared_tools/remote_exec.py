@@ -25,8 +25,9 @@ from __future__ import annotations
 import logging
 import time
 from abc import ABC
+from collections.abc import Callable
 from pathlib import Path
-from typing import Callable, ClassVar
+from typing import ClassVar
 
 import requests
 
@@ -47,7 +48,7 @@ class ConnectorRegistry(dict):
     just because they both build on this base.
     """
 
-    def register(self, cls: type["VendorConnector"]) -> type["VendorConnector"]:
+    def register(self, cls: type[VendorConnector]) -> type[VendorConnector]:
         """Class decorator: adds ``cls`` to this registry under its own
         ``vendor`` attribute. Bind a project-local name to the bound method
         (``register_connector = CONNECTOR_REGISTRY.register``) to use it as
@@ -102,10 +103,10 @@ class VendorConnector(ABC):
     # -- remote script execution -------------------------------------------
 
     def deploy_and_run(
-            self,
-            script_path: str | Path,
-            target_id: str,
-            script_args: dict[str, str] | None = None,
+        self,
+        script_path: str | Path,
+        target_id: str,
+        script_args: dict[str, str] | None = None,
     ) -> str:
         """Push a script to ``target_id``, execute it, and return its stdout.
 
@@ -115,16 +116,13 @@ class VendorConnector(ABC):
         """
         if not self.supports_remote_execution:
             raise ConnectorError(
-                f"{self.vendor}: does not support remote script execution "
-                f"(fetch_inventory-only vendor)"
+                f"{self.vendor}: does not support remote script execution (fetch_inventory-only vendor)"
             )
         if self.is_live:
             return self._live_deploy_and_run(Path(script_path), target_id, script_args or {})
         return self._fixture_deploy_and_run(Path(script_path), target_id, script_args or {})
 
-    def _live_deploy_and_run(
-            self, script_path: Path, target_id: str, script_args: dict[str, str]
-    ) -> str:
+    def _live_deploy_and_run(self, script_path: Path, target_id: str, script_args: dict[str, str]) -> str:
         """Default for a vendor that hasn't implemented live remote execution.
 
         The public ``deploy_and_run`` already refuses before reaching here
@@ -134,9 +132,7 @@ class VendorConnector(ABC):
         """
         raise ConnectorError(f"{self.vendor}: remote script execution not implemented")
 
-    def _fixture_deploy_and_run(
-            self, script_path: Path, target_id: str, script_args: dict[str, str]
-    ) -> str:
+    def _fixture_deploy_and_run(self, script_path: Path, target_id: str, script_args: dict[str, str]) -> str:
         """Canned stand-in for a live remote-execution run.
 
         What "canned" means (file naming, any post-processing) is
@@ -144,17 +140,14 @@ class VendorConnector(ABC):
         True`` must override this.
         """
         raise ConnectorError(
-            f"{self.vendor}: no fixture behavior defined for deploy_and_run "
-            f"(override _fixture_deploy_and_run)"
+            f"{self.vendor}: no fixture behavior defined for deploy_and_run (override _fixture_deploy_and_run)"
         )
 
     # -- helpers -------------------------------------------------------------
 
     def _fixture_path(self, filename: str) -> Path:
         if not self.fixture_dir:
-            raise ConnectorError(
-                f"{self.vendor}: no credentials configured and no fixture_dir provided"
-            )
+            raise ConnectorError(f"{self.vendor}: no credentials configured and no fixture_dir provided")
         path = self.fixture_dir / filename
         if not path.exists():
             raise ConnectorError(f"{self.vendor}: fixture not found: {path}")

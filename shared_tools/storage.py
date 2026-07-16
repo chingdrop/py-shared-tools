@@ -38,13 +38,13 @@ class ObjectStorage:
     """
 
     def __init__(
-            self,
-            bucket: str,
-            *,
-            endpoint_url: str | None = None,
-            access_key: str | None = None,
-            secret_key: str | None = None,
-            region: str = "us-east-1",
+        self,
+        bucket: str,
+        *,
+        endpoint_url: str | None = None,
+        access_key: str | None = None,
+        secret_key: str | None = None,
+        region: str = "us-east-1",
     ):
         self.bucket = bucket
         self.client = boto3.client(
@@ -81,9 +81,7 @@ class ObjectStorage:
                 ExpiresIn=expires_in,
             )
         except (BotoCoreError, ClientError) as exc:
-            raise StorageError(
-                f"failed to create presigned upload URL for {key!r}: {exc}"
-            ) from exc
+            raise StorageError(f"failed to create presigned upload URL for {key!r}: {exc}") from exc
 
     def get_object(self, key: str) -> bytes:
         try:

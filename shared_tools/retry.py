@@ -18,14 +18,12 @@ from __future__ import annotations
 
 import logging
 import time
-from typing import Callable, TypeVar
+from collections.abc import Callable
 
 logger = logging.getLogger(__name__)
 
-T = TypeVar("T")
 
-
-def call_with_retry(
+def call_with_retry[T](
     func: Callable[[], T],
     *,
     retries: int = 3,

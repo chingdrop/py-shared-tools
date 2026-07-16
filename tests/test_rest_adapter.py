@@ -33,16 +33,15 @@ def _adapter(**config_kwargs) -> RestAdapter:
 
 def test_json_content_type_returns_dict(monkeypatch):
     adapter = _adapter()
-    monkeypatch.setattr(
-        adapter.session, "request", lambda **kw: _FakeResponse(json_data={"ok": True})
-    )
+    monkeypatch.setattr(adapter.session, "request", lambda **kw: _FakeResponse(json_data={"ok": True}))
     assert adapter.get("/agents") == {"ok": True}
 
 
 def test_text_content_type_returns_str(monkeypatch):
     adapter = _adapter()
     monkeypatch.setattr(
-        adapter.session, "request",
+        adapter.session,
+        "request",
         lambda **kw: _FakeResponse(text="Name,Enabled\nWS-01,True\n", content_type="text/csv"),
     )
     result = adapter.get("/export")
@@ -53,7 +52,8 @@ def test_text_content_type_returns_str(monkeypatch):
 def test_html_content_type_returns_str(monkeypatch):
     adapter = _adapter()
     monkeypatch.setattr(
-        adapter.session, "request",
+        adapter.session,
+        "request",
         lambda **kw: _FakeResponse(text="<html></html>", content_type="text/html; charset=utf-8"),
     )
     assert adapter.get("/page") == "<html></html>"
@@ -62,7 +62,8 @@ def test_html_content_type_returns_str(monkeypatch):
 def test_unrecognized_content_type_returns_raw_bytes(monkeypatch):
     adapter = _adapter()
     monkeypatch.setattr(
-        adapter.session, "request",
+        adapter.session,
+        "request",
         lambda **kw: _FakeResponse(text="binary-ish", content_type="application/octet-stream"),
     )
     result = adapter.get("/blob")
@@ -98,7 +99,8 @@ def test_per_call_headers_override_session_headers(monkeypatch):
     adapter = _adapter(headers={"Authorization": "ApiToken default"})
     seen = {}
     monkeypatch.setattr(
-        adapter.session, "request",
+        adapter.session,
+        "request",
         lambda **kw: (seen.update(headers=kw["headers"]), _FakeResponse(json_data={}))[1],
     )
     adapter.get("/x", headers={"Authorization": "ApiToken override"})
@@ -109,7 +111,8 @@ def test_endpoint_joins_against_base_url(monkeypatch):
     adapter = _adapter()
     seen = {}
     monkeypatch.setattr(
-        adapter.session, "request",
+        adapter.session,
+        "request",
         lambda **kw: (seen.update(url=kw["url"]), _FakeResponse(json_data={}))[1],
     )
     adapter.get("/web/api/v2.1/agents")
@@ -122,7 +125,8 @@ def test_absolute_endpoint_overrides_base_url(monkeypatch):
     adapter = _adapter()
     seen = {}
     monkeypatch.setattr(
-        adapter.session, "request",
+        adapter.session,
+        "request",
         lambda **kw: (seen.update(url=kw["url"]), _FakeResponse(json_data={}))[1],
     )
     adapter.get("https://other-host.example/path")
@@ -133,7 +137,8 @@ def test_timeout_falls_back_to_config_default(monkeypatch):
     adapter = _adapter(timeout=42.0)
     seen = {}
     monkeypatch.setattr(
-        adapter.session, "request",
+        adapter.session,
+        "request",
         lambda **kw: (seen.update(timeout=kw["timeout"]), _FakeResponse(json_data={}))[1],
     )
     adapter.get("/x")
@@ -144,7 +149,8 @@ def test_files_kwarg_passed_through(monkeypatch):
     adapter = _adapter()
     seen = {}
     monkeypatch.setattr(
-        adapter.session, "request",
+        adapter.session,
+        "request",
         lambda **kw: (seen.update(files=kw["files"]), _FakeResponse(json_data={}))[1],
     )
     adapter.post("/upload", files={"file": ("script.ps1", b"contents")})
