@@ -65,6 +65,17 @@ unaffected either way.
   same logger updates the level but never attaches a second handler, so a
   script and something it imports (or a test re-running the same entrypoint)
   can both call it without doubled-up log lines. Stdlib-only.
+- `shared_tools/tabular_io.py` — `read_structured_file`/`write_structured_file`/
+  `TabularIOError`, extension-dispatch tabular file I/O: read or write a
+  DataFrame as CSV/Excel/JSON/HTML based on the file's extension, without the
+  caller picking the right pandas method itself. Extracted from
+  `vega-tools`' `pandas_tools.py` (generic plumbing unrelated to that
+  project's own domain); `agent-parity`'s `cli.py` and `medicare-rebuild`'s
+  `__main__.py` each hand-rolled a narrower slice of the same job (CSV-only,
+  Excel-only, respectively). Text formats are written atomically via
+  `shared_tools.atomic_io.atomic_write`; Excel isn't (no equivalent cheap
+  in-memory-string round trip). Requires the `tabular` extra (`pandas`,
+  `openpyxl`); everything else in this package works without it.
 - `shared_tools/remote_exec.py` — `VendorConnector`/`ConnectorError`/
   `ConnectorRegistry`, the generic parts of a vendor security-console
   connector: a credentialed `RestAdapter` session, live-vs-fixture dispatch
@@ -98,7 +109,7 @@ unaffected either way.
 
 ```console
 git submodule add <this-repo-url> vendor/py-shared-tools
-uv add --editable vendor/py-shared-tools[storage]   # drop [storage] if you don't need ObjectStorage
+uv add --editable "vendor/py-shared-tools[storage,yaml,tabular]"   # drop whichever extras you don't need
 ```
 
 ```python
@@ -108,6 +119,7 @@ from shared_tools.config import resolve_env_refs, ConfigError, StorageConfig, ge
 from shared_tools.config_loader import ConfigLoader
 from shared_tools.atomic_io import atomic_write, ensure_dir
 from shared_tools.logging_setup import setup_logging
+from shared_tools.tabular_io import read_structured_file, write_structured_file, TabularIOError
 from shared_tools.remote_exec import VendorConnector, ConnectorError, ConnectorRegistry
 from shared_tools.sentinelone import SentinelOneRSOMixin
 from shared_tools.script_export import run_script_export, ScriptExecutionError

@@ -7,8 +7,8 @@ packages = ["src/shared_tools"]
 
 [project]
 name = "py-shared-tools"
-version = "1.2.2"
-description = "Small, dependency-minimal HTTP/storage/config/vendor-connector/retry utilities shared across personal projects (RestAdapter, ObjectStorage, config env-ref resolution, ConfigLoader, atomic file writes, idempotent logging setup, VendorConnector/remote_exec, SentinelOne RSO mixin, script-export storage handoff, generic retry-with-backoff)."
+version = "1.3.0"
+description = "Small, dependency-minimal HTTP/storage/config/vendor-connector/retry utilities shared across personal projects (RestAdapter, ObjectStorage, config env-ref resolution, ConfigLoader, atomic file writes, idempotent logging setup, tabular file I/O, VendorConnector/remote_exec, SentinelOne RSO mixin, script-export storage handoff, generic retry-with-backoff)."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -20,6 +20,7 @@ dependencies = [
 [project.optional-dependencies]
 storage = ["boto3>=1.34"]
 yaml = ["pyyaml>=6.0"]
+tabular = ["pandas>=2.0", "openpyxl>=3.1"]
 
 [dependency-groups]
 dev = [
@@ -27,9 +28,12 @@ dev = [
     "moto[s3]>=5.0",
     "boto3>=1.34",
     "pyyaml>=6.0",
+    "pandas>=2.0",
+    "openpyxl>=3.1",
     "ruff>=0.15.21",
     "mypy>=1.13",
     "types-pyyaml>=6.0",
+    "pandas-stubs>=2.0",
 ]
 
 [tool.pytest.ini_options]
