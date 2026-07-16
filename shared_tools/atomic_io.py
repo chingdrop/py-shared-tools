@@ -48,14 +48,18 @@ def atomic_write(path: Path | str, data: str | bytes, *, encoding: str = "utf-8"
     is inferred from ``data``'s type.
     """
     path = Path(path)
-    binary = isinstance(data, bytes)
     fd, tmp_name = tempfile.mkstemp(dir=path.parent, prefix=f".{path.name}.", suffix=".tmp")
     try:
-        open_kwargs = {} if binary else {"encoding": encoding}
-        with os.fdopen(fd, "wb" if binary else "w", **open_kwargs) as fh:
-            fh.write(data)
-            fh.flush()
-            os.fsync(fh.fileno())
+        if isinstance(data, bytes):
+            with os.fdopen(fd, "wb") as bfh:
+                bfh.write(data)
+                bfh.flush()
+                os.fsync(bfh.fileno())
+        else:
+            with os.fdopen(fd, "w", encoding=encoding) as tfh:
+                tfh.write(data)
+                tfh.flush()
+                os.fsync(tfh.fileno())
         os.replace(tmp_name, path)
     except BaseException:
         # os.replace either fully succeeds or doesn't move the temp file at

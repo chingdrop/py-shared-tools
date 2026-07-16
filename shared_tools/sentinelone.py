@@ -19,8 +19,35 @@ into also provides ``shared_tools.remote_exec.VendorConnector``'s
 from __future__ import annotations
 
 from pathlib import Path
+from typing import TYPE_CHECKING, Protocol
 
 from shared_tools.remote_exec import ConnectorError
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    class _ConnectorLike(Protocol):
+        """The full interface ``self`` needs at each of this mixin's own call
+        sites — both what a cooperating ``VendorConnector``-derived base
+        must supply (``credentials``, ``vendor``, ``_request*``,
+        ``_as_text``, ``_poll_until``) and ``_headers``, which the mixin
+        defines itself but which other methods here reach via ``self`` just
+        the same. A type-checking-only stand-in, never instantiated or
+        inherited from at runtime (see ``SentinelOneRSOMixin``'s own
+        docstring for why the mixin itself deliberately doesn't inherit
+        ``VendorConnector``).
+        """
+
+        credentials: dict
+        vendor: str
+
+        @property
+        def _headers(self) -> dict: ...
+        def _request(self, method: str, url: str, **kwargs: object) -> dict | str | bytes: ...
+        def _request_json(self, method: str, url: str, **kwargs: object) -> dict: ...
+        @staticmethod
+        def _as_text(payload: dict | str | bytes) -> str: ...
+        def _poll_until(self, check: Callable[[], str | None], what: str) -> str: ...
 
 
 class SentinelOneRSOMixin:
@@ -30,14 +57,20 @@ class SentinelOneRSOMixin:
 
     Deliberately does not set ``vendor``/``required_credentials`` itself, so
     ``@register_connector`` always decorates a real, concrete connector
-    class — never this shared mixin.
+    class — never this shared mixin. For the same reason it doesn't actually
+    inherit ``VendorConnector`` either (that would force a specific MRO on
+    every consumer); each method instead declares an explicit ``_ConnectorLike``
+    self-type so the type checker can still verify it, per mypy's documented
+    pattern for mixins (https://mypy.readthedocs.io/en/stable/more_types.html#mixin-classes).
     """
 
     @property
-    def _headers(self) -> dict:
+    def _headers(self: _ConnectorLike) -> dict:
         return {"Authorization": f"ApiToken {self.credentials['api_token']}"}
 
-    def _live_deploy_and_run(self, script_path: Path, target_id: str, script_args: dict[str, str]) -> str:
+    def _live_deploy_and_run(
+        self: _ConnectorLike, script_path: Path, target_id: str, script_args: dict[str, str]
+    ) -> str:
         base = self.credentials["api_url"].rstrip("/")
 
         # 1. Upload the script to the script library.

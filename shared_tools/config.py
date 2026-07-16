@@ -103,6 +103,10 @@ def get_storage(storage_config: StorageConfig):
     """
     if not storage_config.enabled:
         return None
+    # `enabled` already confirmed these are set; asserting narrows them from
+    # `str | None` to `str` for the type checker (a property check alone
+    # doesn't narrow the attributes it read).
+    assert storage_config.bucket and storage_config.access_key and storage_config.secret_key
 
     # Imported here, not at module level, so callers that don't need the
     # storage extra (boto3) aren't forced to have it installed.

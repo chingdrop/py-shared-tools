@@ -85,7 +85,7 @@ class RestAdapter:
         if headers:
             req_headers.update(headers)
 
-        self.logger.debug(f"→ {method} {url} params={params} json={json or data}")
+        self.logger.debug(f"→ {method} {url} params={params} json={json or data!r}")
         resp = self.session.request(
             method=method,
             url=url,
